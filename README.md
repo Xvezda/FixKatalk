@@ -7,7 +7,7 @@ MacOS에서 제공하는 타임머신 백업을 이용하여 복원한 이후 �
 ## 사용법
 GitHub에서 제공하는 [Release 페이지](https://github.com/Xvezda/FixKatalk/releases)를 통해 안정적인 버전을 다운로드 받거나,
 최신버전의 경우 [Download ZIP](https://github.com/Xvezda/FixKatalk/archive/main.zip)을 통해 실행 프로그램을 다운로드 받으신 후
-`FixKatalk.app`을 더블클릭하여 실행하시면 됩니다.
+압축해제하여 폴더 내의 `FixKatalk.app`을 더블클릭하여 실행하시면 됩니다.
 
 혹은, 다른 GitHub Repository와 마찬가지로
 `git clone https://github.com/Xvezda/FixKatalk.git` 명령을 통해 저장소를
