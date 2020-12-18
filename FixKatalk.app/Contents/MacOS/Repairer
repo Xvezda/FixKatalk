@@ -1,1 +1,83 @@
-#!/usr/bin/env bash
+#!/usr/bin/osascript
+(* Copyright (c) 2020 Xvezda <xvezda@naver.com>
+
+Use of this source code is governed by an MIT-style
+license that can be found in the LICENSE file or at
+https://opensource.org/licenses/MIT.
+
+*)
+
+set userCancelCode to -128
+
+-- 작업 복원이 가능하도록 휴지통을 삭제함수로 사용
+on trashFile from paths as list
+    set posixFilePaths to {}
+    repeat with p in paths
+        set end of posixFilePaths to (POSIX file p)
+    end repeat
+    tell application "Finder" to delete every item of posixFilePaths
+end trashFile
+
+
+--카카오톡이 실행중이면 알림창을 띄우고 종료 {{{1
+set appName to "KakaoTalk"
+if application appName is running then
+    try
+        set dialogResult to display dialog ¬
+            "안정적인 동작을 위해 카카오톡이 종료된 상태로 " ¬
+            & "진행하시는것을 권장하고 있습니다." & return & return ¬
+            & "카카오톡을 종료하시겠습니까?" ¬
+            with icon stop ¬
+            with title "카카오톡이 실행중입니다."
+        -- OK 버튼을 누른경우 카카오톡을 종료
+        if button returned of dialogResult is "OK" then
+            tell application appName to quit
+        end if
+    on error number userCancelCode
+        -- 취소를 누를경우 아무것도 하지 않음
+    end try
+end if -- 1}}}
+
+-- 로그인이 되지 않는현상 해결 {{{1
+set homePath to system attribute "HOME"
+set pkgName to "com.kakao.KakaoTalkMac"
+set libPath to homePath & "/Library"
+set pkgPath to libPath & "/Containers/" & pkgName
+set pkgLib to pkgPath & "/Data/Library"
+
+set filesToTrash to {}
+
+-- 설정파일 삭제 {{{2
+set prefPath to pkgLib & "/Preferences"
+tell application "System Events"
+    set prefFiles to every file of folder prefPath
+    repeat with prefFile in prefFiles
+        set prefFileName to (name of prefFile as string)
+        if prefFileName starts with pkgName then
+            -- my trashFile from prefFile
+            set end of filesToTrash to (POSIX path of prefFile)
+        end if
+    end repeat
+end tell -- 2}}}
+
+-- 캐시파일 삭제 {{{2
+set cachePath to pkgLib & "/Caches"
+set end of filesToTrash to cachePath
+-- 2}}}
+-- 1}}}
+
+
+-- 초기화면(친구목록)에서 프리징되는 현상해결 {{{1
+set end of filesToTrash to do shell script "find " ¬
+    & quoted form of (pkgLib & "/Application Support/" & pkgName) ¬
+    & " -type f -maxdepth 1 -regex '.*/[0-9a-z]*'"
+-- 1}}}
+
+-- 파일 삭제
+-- repeat with f in filesToTrash
+--     display dialog f buttons "OK"
+-- end repeat
+trashFile from filesToTrash
+
+display alert "작업이 완료되었습니다! 🎉"
+
