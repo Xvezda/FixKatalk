@@ -27,10 +27,12 @@ script FixKatalk
                 "안정적인 동작을 위해 카카오톡이 종료된 상태로 " ¬
                 & "진행하시는것을 권장하고 있습니다." & return & return ¬
                 & "카카오톡을 종료하시겠습니까?" ¬
-                with icon stop ¬
-                with title "카카오톡이 실행중입니다."
+                buttons {"아니요", "네"} ¬
+                default button "네" cancel button "아니요" ¬
+                with title "카카오톡이 실행중입니다." ¬
+                with icon stop
             -- OK 버튼을 누른경우 카카오톡을 종료
-            if button returned of dialogResult is "OK" then
+            if button returned of dialogResult is "네" then
                 tell application appName to quit
             end if
         on error number userCancelCode
